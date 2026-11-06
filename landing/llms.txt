@@ -1,0 +1,20 @@
+# AutoFactory
+
+> AutoFactory turns customer-supplied manufacturing designs into quoted, paid,
+> manufactured physical goods. The initial workflow is FDM 3D printing.
+
+New API keys require operator activation. Quotes are not orders; confirmed
+payment creates an order. A human must approve the exact purchase and complete
+hosted checkout. Agents do not control printers or retrieve production artifacts.
+Use the operator-confirmed API origin and capabilities; do not assume production
+availability, supported destinations, materials, pricing, or turnaround.
+
+## Agent instructions
+
+- [AutoFactory skill](https://autofactory.build/skill.md): Customer workflow, approval boundaries, and verification.
+- [HTTP workflow](https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/references/api-workflow.md): HTTP request examples and durable-resource readbacks.
+- [Troubleshooting](https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/references/troubleshooting.md): Activation, rate limits, uncertain requests, and quote conflicts.
+
+## Optional
+
+- [Skill repository](https://github.com/autofactory-build/autofactory-skill): Source, review history, and installation instructions.
