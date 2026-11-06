@@ -24,7 +24,7 @@ credentials with repository access.
 - [`landing/llms.txt`](landing/llms.txt): a draft discovery index, not yet deployed.
 
 The skill is Markdown-only and uses the [Agent Skills format](https://agentskills.io/specification).
-The curl examples are optional; any HTTP client works.
+The examples are standalone curl commands with placeholders; any HTTP client works.
 
 ## Review status
 

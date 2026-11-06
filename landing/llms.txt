@@ -1,18 +1,12 @@
 # AutoFactory
 
-> Get 3D models manufactured through an agent-friendly API. Upload a model,
-> choose a material, get a quote, and send the buyer a checkout link.
+> Get 3D models manufactured through an agent-friendly API. Upload models,
+> choose materials and quantities, get a quote, and send the buyer a checkout link.
 
 Agents handle quoting and order updates. The buyer completes hosted checkout.
-New API keys need activation. The API reports current materials, limits, prices
-and order state.
+Only AutoFactory operators can activate new API keys. The API reports current
+materials, limits, prices and order state.
 
-## Agent instructions
+## Agent skill
 
-- [AutoFactory skill](https://autofactory.build/skill.md): Start here for quoting and order tracking.
-- [API workflow](https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/references/api-workflow.md): Task references and HTTP examples.
-- [Troubleshooting](https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/references/troubleshooting.md): Activation, rate limits and request recovery.
-
-## Optional
-
-- [Skill repository](https://github.com/autofactory-build/autofactory-skill): Source and installation instructions.
+- [AutoFactory skill repository](https://github.com/autofactory-build/autofactory-skill): Installation, instructions and API task references.

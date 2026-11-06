@@ -1,42 +1,50 @@
 # Create a manufacturing request
 
-Use the [API access setup](authentication.md), a ready [asset](uploads.md), and
-material/profile selections from the [catalog](catalogs.md).
+An RFQ has an `items` array. Add an item for each model/material/profile choice
+and set its quantity to the number of copies. Upload each distinct file first;
+reuse its ready asset ID wherever that model appears. Stay within capability
+limits for item count and quantity.
 
-Use the saved `AF_ASSET_ID`, selected `AF_MATERIAL_ID` and `AF_PROFILE_ID`, integer
-`AF_QUANTITY`, and destination `AF_COUNTRY`/`AF_POSTAL`.
+This example requests ten copies of one model and three of another. Replace the
+IDs with values from [uploads](uploads.md) and the [catalog](catalogs.md), and
+replace the example quantities and destination with the request's values.
+Expected status: 201.
 
 ```bash
-jq -n --arg asset "$AF_ASSET_ID" --arg material "$AF_MATERIAL_ID" \
-  --arg profile "$AF_PROFILE_ID" --argjson quantity "$AF_QUANTITY" \
-  --arg country "$AF_COUNTRY" --arg postal "$AF_POSTAL" \
-  '{items:[{manufacturing_method:"fdm_3d_printing",asset_id:$asset,
-    material_id:$material,quantity:$quantity,
-    configuration:{profile_id:$profile,overrides:{}}}],
-    destination:{country_code:$country,postal_code:$postal}}' \
-  > "$AF_PRIVATE_DIR/rfq-request.json"
-AF_STATUS=$(curl --disable --config "$AF_PRIVATE_DIR/api.curl" \
-  --silent --show-error --fail-with-body --proto '=https' \
-  --request POST "$AF_ORIGIN/v1/rfqs" \
-  --dump-header "$AF_PRIVATE_DIR/rfq.headers" \
-  --output "$AF_PRIVATE_DIR/rfq.json" \
+curl --include --fail-with-body --request POST \
+  'https://<api-host>/v1/rfqs' \
+  --header 'Authorization: Bearer <api-key>' \
   --header 'Content-Type: application/json' \
-  --data-binary "@$AF_PRIVATE_DIR/rfq-request.json" \
-  --write-out '%{http_code}') || exit 1
-test "$AF_STATUS" = 201 || exit 1
-AF_RFQ_ID=$(jq -er '.id' "$AF_PRIVATE_DIR/rfq.json")
-AF_STATUS=$(curl --disable --config "$AF_PRIVATE_DIR/api.curl" \
-  --silent --show-error --fail-with-body --proto '=https' \
-  --request GET "$AF_ORIGIN/v1/rfqs/$AF_RFQ_ID" \
-  --dump-header "$AF_PRIVATE_DIR/rfq-readback.headers" \
-  --output "$AF_PRIVATE_DIR/rfq-readback.json" \
-  --write-out '%{http_code}') || exit 1
-test "$AF_STATUS" = 200 || exit 1
-jq -e '.missing_fields == [] and
-  (.allowed_actions | index("create_quote") != null)' \
-  "$AF_PRIVATE_DIR/rfq-readback.json" >/dev/null
+  --data '{
+    "items": [
+      {
+        "manufacturing_method": "fdm_3d_printing",
+        "asset_id": "<first-asset-id>",
+        "material_id": "<first-material-id>",
+        "quantity": 10,
+        "configuration": {"profile_id": "<first-profile-id>", "overrides": {}}
+      },
+      {
+        "manufacturing_method": "fdm_3d_printing",
+        "asset_id": "<second-asset-id>",
+        "material_id": "<second-material-id>",
+        "quantity": 3,
+        "configuration": {"profile_id": "<second-profile-id>", "overrides": {}}
+      }
+    ],
+    "destination": {"country_code": "US", "postal_code": "95814"}
+  }'
 ```
 
-Check the returned items, destination and revision against the request. RFQ edits
-create a new revision and supersede earlier quotes. Update the RFQ when the request
-changes; keep earlier offers as history.
+Read the returned RFQ `id` (200):
+
+```bash
+curl --include --fail-with-body \
+  'https://<api-host>/v1/rfqs/<rfq-id>' \
+  --header 'Authorization: Bearer <api-key>'
+```
+
+Check the items, destination and revision. When `missing_fields` is empty and
+`allowed_actions` includes `create_quote`, request a [quote](quotes.md).
+RFQ edits create a new revision and supersede earlier offers; keep those offers
+as history.

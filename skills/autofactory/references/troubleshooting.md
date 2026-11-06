@@ -5,7 +5,7 @@ AutoFactory diagnose an issue; tokens and signed URLs are not needed in a report
 
 | Response or state | Next step |
 | --- | --- |
-| 401 | Check endpoint and credential. New keys need activation; send the key ID to AutoFactory. A 401 alone does not distinguish pending, invalid or disabled access. |
+| 401 | Check endpoint and credential. Only AutoFactory operators can change activation; send the key ID to AutoFactory. A 401 alone does not distinguish pending, invalid or disabled access. |
 | 403 | The key cannot perform that operation. Check the documented workflow or contact AutoFactory about access. |
 | 404 | Check the saved resource ID and owning account. Missing, inaccessible and archived resources can all be unavailable. |
 | 429 | Honor Retry-After, then use bounded backoff with the same key and resource. |

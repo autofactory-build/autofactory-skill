@@ -1,7 +1,7 @@
 ---
 name: autofactory
 description: Upload 3D models, get manufacturing quotes, and track orders with AutoFactory.
-compatibility: Requires an AutoFactory API endpoint and HTTPS access. Examples use Bash, curl and jq; any HTTP client works.
+compatibility: Requires an AutoFactory API endpoint and HTTPS access. Examples use curl; any HTTP client works.
 metadata:
   author: Joseph Rodrigues (@DoWhileGeek)
   version: '0.1.0'
@@ -9,8 +9,9 @@ metadata:
 
 # AutoFactory skill
 
-Get a 3D model made. Upload the file, choose a material, get a quote, and send the
-checkout link to the person buying it. After payment, track the order through the API.
+Get 3D models made, with multiple designs and quantities in the same request.
+Upload the models, choose materials, get a quote, and send the checkout link to
+the buyer. After payment, track the order through the API.
 
 Work from the request and context you already have. Carry the task through to a
 ready quote without asking for approval at each step. Use stated preferences and
@@ -21,11 +22,12 @@ tradeoff blocks progress. Include your selections with the quote.
 
 Use the configured AutoFactory API endpoint and credentials. If you need a key,
 `POST /v1/api-keys` issues one without a request body. Save the token with your
-usual credential tools. New keys start with `active: false`; send the key ID to
+usual credential tools. New keys start with `active: false`. Only AutoFactory
+operators can change activation; customer tokens cannot. Send the key ID to
 AutoFactory for activation, then check access with `GET /v1/me`.
 
-The API examples use `AF_ORIGIN` for the HTTPS endpoint. See
-[authentication](references/authentication.md) for setup and exact requests.
+The curl examples use placeholders for the API host, token and resource IDs. See
+[authentication](references/authentication.md) for issuance and access checks.
 
 ## Get a quote
 
@@ -33,13 +35,16 @@ The API examples use `AF_ORIGIN` for the HTTPS endpoint. See
    Follow pagination and choose an available material and active profile that fit
    the request. Check file formats and limits before uploading. Use STL and
    `overrides: {}` for the documented flow. See [catalogs](references/catalogs.md).
-2. Reserve an upload with `POST /v1/assets`. PUT the file to the returned URL with
-   its required headers, using a separate request without the API bearer token.
+2. Reserve an upload for each distinct model with `POST /v1/assets`. PUT each file
+   to its returned URL with its required headers, using a separate request without
+   the API bearer token.
    Poll `GET /v1/assets/{asset_id}` until `ready` or `rejected`. Inspection runs
    automatically; there is no upload-completion endpoint. See [uploads](references/uploads.md).
-3. Create an RFQ with `POST /v1/rfqs`. Each item needs `manufacturing_method:
-   fdm_3d_printing`, `asset_id`, `material_id`, `quantity`, and `configuration`
-   containing `profile_id` and `overrides: {}`. Add the destination country and
+3. Create an RFQ with `POST /v1/rfqs`. Add each model/material/profile choice to
+   `items`, with its own quantity, within capability limits. Each item needs
+   `manufacturing_method: fdm_3d_printing`, `asset_id`, `material_id`, `quantity`,
+   and `configuration` containing `profile_id` and `overrides: {}`. Add the
+   destination country and
    postal code. Read the RFQ back and check `missing_fields` and `allowed_actions`.
    See [RFQs](references/rfqs.md).
 4. Request a quote with `POST /v1/rfqs/{rfq_id}/quote` (singular, no body).

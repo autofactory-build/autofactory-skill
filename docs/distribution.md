@@ -23,23 +23,19 @@ step to pick up later changes.
 
 ## Landing integration (proposed)
 
-After public release, add a visible `For AI agents` link to `/skill.md` and serve
-`landing/llms.txt` at `/llms.txt`. The index follows the [llms.txt proposal](https://llmstxt.org/).
+After public release, add a visible `For AI agents` link to
+`https://github.com/autofactory-build/autofactory-skill` and serve `landing/llms.txt`
+at `/llms.txt`. The index follows the [llms.txt proposal](https://llmstxt.org/).
 An optional HTML discovery hint is `<link rel="describedby" href="/llms.txt">`.
 
-A Cloudflare Pages redirect can point at the source:
+Both entry points link to the repository rather than individual skill files. The
+repository owns installation, the skill entry point and its reference layout, so
+the landing site does not need to track that structure. No `/skill.md` redirect is
+needed.
 
-```text
-/skill.md https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/SKILL.md 302
-```
-
-The redirect targets the raw file so its relative references resolve beside it.
-The index also links to raw references directly. Fetch these as public documents,
-without API credentials. Verify reference resolution with the actual reader at
-release time.
-
-Later skill edits need only a merge to GitHub; changing the index or redirect still
-needs a landing release. GitHub/CDN caches and installed copies may update later.
+Later skill edits need only a merge to GitHub. Changing the repository link or
+landing index still needs a landing release. Installed copies use their normal
+update mechanism.
 
 ## Release checklist
 

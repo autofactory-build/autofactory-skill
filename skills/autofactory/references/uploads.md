@@ -1,61 +1,48 @@
-# Upload a model
+# Upload models
 
-Use the [API access setup](authentication.md). Check [catalogs](catalogs.md) for
-supported file formats and limits.
+Reserve an asset for each distinct model file. The same ready asset can be used
+for multiple copies or different material/profile choices in an RFQ. Check
+[catalog capabilities](catalogs.md) for formats and limits.
 
-Set `AF_FILE` to the local STL path and check that it exists. Reservation takes no
-body or Content-Type.
+## Reserve an upload
 
-```bash
-: "${AF_FILE:?local STL file required}"
-test -f "$AF_FILE"
-AF_STATUS=$(curl --disable --config "$AF_PRIVATE_DIR/api.curl" \
-  --silent --show-error --fail-with-body --proto '=https' \
-  --request POST "$AF_ORIGIN/v1/assets" \
-  --dump-header "$AF_PRIVATE_DIR/upload.headers" \
-  --output "$AF_PRIVATE_DIR/upload.json" \
-  --write-out '%{http_code}') || exit 1
-test "$AF_STATUS" = 201 || exit 1
-AF_ASSET_ID=$(jq -er '.asset_id' "$AF_PRIVATE_DIR/upload.json")
-jq -e '.method == "PUT" and (.url | startswith("https://"))' \
-  "$AF_PRIVATE_DIR/upload.json" >/dev/null
-
-# Each required upload header and the signed URL stay in a private config.
-jq -er '(["url = " + (.url | @json)] +
-  [.headers | to_entries[] | "header = " + ((.key + ": " + .value) | @json)])
-  | join("\n")' "$AF_PRIVATE_DIR/upload.json" > "$AF_PRIVATE_DIR/upload.curl"
-
-# Separate curl invocation: NO API bearer config or Authorization header.
-AF_STATUS=$(curl --disable --config "$AF_PRIVATE_DIR/upload.curl" \
-  --silent --show-error --fail-with-body --proto '=https' \
-  --stderr "$AF_PRIVATE_DIR/put.errors" \
-  --request PUT --upload-file "$AF_FILE" \
-  --header 'Content-Disposition: attachment; filename="design.stl"' \
-  --dump-header "$AF_PRIVATE_DIR/put.headers" \
-  --output "$AF_PRIVATE_DIR/put.response" --write-out '%{http_code}') || exit 1
-test "$AF_STATUS" = 200 || exit 1
-
-AF_STATUS=$(curl --disable --config "$AF_PRIVATE_DIR/api.curl" \
-  --silent --show-error --fail-with-body --proto '=https' \
-  --request GET "$AF_ORIGIN/v1/assets/$AF_ASSET_ID" \
-  --dump-header "$AF_PRIVATE_DIR/asset.headers" \
-  --output "$AF_PRIVATE_DIR/asset.json" \
-  --write-out '%{http_code}') || exit 1
-test "$AF_STATUS" = 200 || exit 1
-jq '{id,state,rejection,byte_size,file_format,dimensions_mm}' \
-  "$AF_PRIVATE_DIR/asset.json"
-```
-
-The optional filename is a display label. Use the returned upload URL before it
-expires, with its required headers and without the API bearer token.
-`If-None-Match: *` makes the upload create-only. After PUT, inspection runs
-automatically; there is no upload-completion endpoint.
-
-Repeat only the asset GET with bounded backoff until `state == "ready"`; stop on
-`rejected` and inspect `rejection`. Honor Retry-After if present. On a lost PUT
-response, read asset status before deciding whether another upload is appropriate.
-Do not create an RFQ referencing `awaiting_upload` or `processing` assets.
+This POST has no body or Content-Type. Expected status: 201.
 
 ```bash
-jq -e '.state == "ready"' "$AF_PRIVATE_DIR/asset.json" >/dev/null
+curl --include --fail-with-body --request POST \
+  'https://<api-host>/v1/assets' \
+  --header 'Authorization: Bearer <api-key>'
 ```
+
+Save `asset_id`, `method`, `url`, `headers` and `expires_at` from the response.
+
+## Upload the file
+
+Replace `<signed-upload-url>` with the returned URL and the path with your local
+file. Use the returned method and all returned headers before `expires_at`.
+The current response requires `If-None-Match: *`. Expected status: 200.
+
+```bash
+curl --include --fail-with-body --request PUT \
+  '<signed-upload-url>' \
+  --header 'If-None-Match: *' \
+  --upload-file '/path/to/model.stl'
+```
+
+This signed request uses no API bearer token. An optional
+`Content-Disposition: attachment; filename="model.stl"` supplies a display name.
+
+## Wait for inspection
+
+Read the asset (200):
+
+```bash
+curl --include --fail-with-body \
+  'https://<api-host>/v1/assets/<asset-id>' \
+  --header 'Authorization: Bearer <api-key>'
+```
+
+Poll this GET with bounded backoff until `ready` or `rejected`; honor Retry-After
+when present. Inspection runs automatically, with no upload-completion endpoint.
+On a lost PUT response, inspect asset status before deciding whether to upload
+again. Use ready assets in the [RFQ](rfqs.md).
