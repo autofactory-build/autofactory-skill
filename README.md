@@ -1,7 +1,7 @@
 # AutoFactory skill
 
 Upload 3D models, get manufacturing quotes, and track orders with AutoFactory.
-The agent handles the quote workflow; the buyer completes hosted checkout.
+The agent handles the quote workflow; your user completes hosted checkout.
 
 Start with [`SKILL.md`](skills/autofactory/SKILL.md). It links to the API reference
 for each task, so agents can load what they need as they go.

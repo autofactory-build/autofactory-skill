@@ -19,11 +19,11 @@ AutoFactory diagnose an issue; tokens and signed URLs are not needed in a report
 | Quote `failed` | Report the reason and resolve it before requesting another quote. |
 | Quote `superseded` | Read the current RFQ revision and active quote. Use the current offer. |
 | 409 `QUOTE_PRICE_CHANGED` | Keep the old quote as history. Read the RFQ's allowed actions and request a fresh offer when eligible; show the replacement prices. |
-| 409 `MATERIAL_UNAVAILABLE` | Recheck the catalog. Use an alternative that fits the request's flexibility, or ask the buyer about a material change. Payment exposure may block RFQ edits. |
+| 409 `MATERIAL_UNAVAILABLE` | Recheck the catalog. Use an alternative that fits the request's flexibility, or ask your user about a material change. Payment exposure may block RFQ edits. |
 | Other 409 | Read the current RFQ/quote state and allowed actions. If an unresolved checkout blocks changes, contact AutoFactory to reconcile it. |
-| Null tax or total | The amount is unknown. Point the buyer to the final hosted-checkout total. |
+| Null tax or total | The amount is unknown. Point your user to the final hosted-checkout total. |
 | Null `checkout_url` | Check quote eligibility. Contact AutoFactory if the ready offer still lacks a link. |
-| Buyer reports a checkout error | Read the quote/RFQ and collect a redacted error/request ID. Leave the signed link to the buyer rather than opening it to test. |
+| User reports a checkout error | Read the quote/RFQ and collect a redacted error/request ID. Leave the signed link to your user rather than opening it to test. |
 | Redirect or `accepted` quote without order association | Check payment through the quote and RFQ. Confirm `paid`, `order_id` and the matching ordered RFQ before reporting an order. |
 | Order exists without tracking | Report its returned state and that tracking is not available yet. |
 

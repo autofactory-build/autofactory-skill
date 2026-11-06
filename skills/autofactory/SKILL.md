@@ -11,7 +11,7 @@ metadata:
 
 Get 3D models made, with multiple designs and quantities in the same request.
 Upload the models, choose materials, get a quote, and send the checkout link to
-the buyer. After payment, track the order through the API.
+your user. After payment, track the order through the API.
 
 Work from the request and context you already have. Carry the task through to a
 ready quote without asking for approval at each step. Use stated preferences and
@@ -54,12 +54,12 @@ The curl examples use placeholders for the API host, token and resource IDs. See
    item costs, quote-level `line_items`, subtotal, shipping, tax, total and currency.
    Money uses integer cents; item costs cover the full quantity. Material and
    manufacturing-time estimates are per unit, not delivery estimates. A null tax
-   or total is unknown; the buyer can check the final amount in hosted checkout.
+   or total is unknown; your user can check the final amount in hosted checkout.
 
 ## Checkout and orders
 
-Send the ready quote's `checkout_url` directly to the buyer with the itemized offer.
-The buyer opens the link and pays. Opening it can create a payment session, so
+Send the ready quote's `checkout_url` directly to your user with the itemized offer.
+Your user opens the link and pays. Opening it can create a payment session, so
 leave it out of automated previews, link checks and HTTP requests. Hosted checkout
 collects the full shipping address. See [checkout](references/checkout.md).
 
