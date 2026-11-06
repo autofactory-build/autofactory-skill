@@ -1,49 +1,35 @@
-# Explicit environment and private storage
+# API access
 
-Optional Bash/curl/jq examples; no scripts or SDK are installed. Read only this task and any needed prerequisites. Never run the full flow unattended.
+Use your configured AutoFactory HTTPS endpoint and existing key. Manage credentials
+with your usual tools. The examples below use a private curl config; adapt them to
+your environment or use another HTTP client.
 
-The operator must set `AF_ORIGIN` to the exact approved HTTPS origin (no path,
-query, fragment, credentials or trailing slash), `AF_PRIVATE_DIR` to a new private
-absolute directory outside any repository/shared workspace, and `AF_FILE` to the
-customer-authorized STL path. There is no default production origin. A contract
-hostname or a staging deployment does not establish live-payment availability.
-
-Disable command tracing, verbose HTTP logs, response capture in shared tools and
-link unfurling. Never paste the key into a command or chat. Existing approved
-credentials should be supplied through private storage as `key.json`, containing
-`token` and the credential `id`; never overwrite an existing credential file.
+For these examples, set `AF_ORIGIN` to the API origin without a trailing slash,
+`AF_PRIVATE_DIR` to an absolute directory for credentials and responses, and
+`AF_FILE` to the local STL path. Only uploads need `AF_FILE`. Store an existing key as `key.json` with `token` and `id` fields.
 
 ```bash
 set +x
 set -euo pipefail
 umask 077
-: "${AF_ORIGIN:?operator-provided HTTPS origin required}"
+: "${AF_ORIGIN:?AutoFactory HTTPS origin required}"
 : "${AF_PRIVATE_DIR:?private absolute directory required}"
-: "${AF_FILE:?authorized local STL file required}"
 case "$AF_ORIGIN" in https://?*) ;; *) exit 1 ;; esac
 AF_AUTHORITY=${AF_ORIGIN#https://}
 case "$AF_AUTHORITY" in *[/?#@]*|'') exit 1 ;; esac
 case "$AF_PRIVATE_DIR" in /*) ;; *) exit 1 ;; esac
 mkdir -p "$AF_PRIVATE_DIR"
 chmod 700 "$AF_PRIVATE_DIR"
-test -f "$AF_FILE"
 ```
 
-Verify the hostname with the operator, not merely the scheme check above.
-Do not use `curl -L`, `--location-trusted`, `-v` or shell tracing with credentials.
-Use a curl build supporting `--fail-with-body`. Each invocation disables default
-curl config loading, saves response headers/body privately and requires the exact
-expected status. Never add redirect-following options. A transport/HTTP failure
-or unexpected status stops the task; consult [troubleshooting](troubleshooting.md)
-before retrying, especially after writes. Keep these shell settings and private
-configuration when running a task-specific example.
+These examples need curl with `--fail-with-body`. Each request checks the expected
+HTTP status and saves its response. They do not follow redirects. Keep the bearer
+config for API calls; upload requests use their own config.
 
-### Optional new-client onboarding — only once, with authorization
+## Get a key
 
-Skip this block when an approved key already exists. No Authorization header,
-body, Content-Type or query parameters are sent. Save the full response privately;
-only the key ID is suitable to share with the operator. A timeout can still mean
-issuance succeeded: do not automatically repeat it.
+Skip this step if you already have a key. `POST /v1/api-keys` takes no body or
+Authorization header. It returns the token once, so save the response.
 
 ```bash
 test ! -e "$AF_PRIVATE_DIR/key.json"
@@ -57,14 +43,11 @@ jq -e '.active == false and (.token | type == "string")' \
 jq -r '.id' "$AF_PRIVATE_DIR/key.json"
 ```
 
-Store the token in the agent's secret store once. There is no token recovery
-endpoint. Each issuance creates a different client, not rotation or recovery.
-**Stop here until the operator approves the returned key ID.** Do not self-activate.
+New keys need activation. Send the returned key ID to AutoFactory and resume after
+activation. Another issuance creates another client; it does not recover or
+activate the first key.
 
-### Prepare an authenticated client after approval
-
-This private curl config avoids placing the bearer token directly in command
-arguments. Do not display the file. Never use it for an upload or checkout link.
+## Check access
 
 ```bash
 jq -er '"header = " + (("Authorization: Bearer " + .token) | @json)' \
@@ -80,7 +63,6 @@ test "$AF_STATUS" = 200 || exit 1
 jq -e '.id and .api_client_id and .rank' "$AF_PRIVATE_DIR/me.json" >/dev/null
 ```
 
-401 cannot distinguish pending approval from invalid/revoked/disabled access.
-Stop and ask the operator; do not run onward or create replacement clients.
-`--fail-with-body` fails on HTTP errors, but not 3xx: inspect saved HTTP status
-headers and reject unexpected redirects before accepting any response.
+A 401 can mean pending activation, an invalid key or disabled access. Check the
+configured endpoint and credential first; contact AutoFactory if activation or
+access needs attention. See [troubleshooting](troubleshooting.md) for recovery.

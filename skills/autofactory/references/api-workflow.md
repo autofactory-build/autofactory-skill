@@ -1,21 +1,20 @@
-# Customer API workflow map
+# API workflow
 
-Load only the reference for the current task and missing prerequisites. Do not
-execute the full workflow unattended. These are optional Bash/curl/jq examples;
-the skill installs no scripts or SDK and may use another private HTTPS client.
+Open the reference for the task at hand. Each has optional curl examples; any HTTP
+client works. Continue through quoting with the context available, asking only for
+missing inputs that block progress. The buyer completes checkout.
 
-| Task | Reference | Prerequisites / completion boundary |
+| Task | Reference | Inputs / result |
 | --- | --- | --- |
-| Establish private state, request approval, validate key | [Authentication](authentication.md) | Explicit operator-confirmed HTTPS origin; existing approved key preferred. |
-| Discover limits and select material/profile | [Catalogs](catalogs.md) | Authenticated client; customer-confirmed selections. |
-| Reserve and upload design | [Uploads](uploads.md) | Authorized supported file; complete PUT then await ready asset. |
-| Create and verify request | [RFQs](rfqs.md) | Ready asset, catalog selections, quantity and destination. |
-| Admit calculation and poll offer | [Quotes](quotes.md) | Actionable RFQ; poll the same quote ID. |
-| Review complete itemized offer | [Checkout](checkout.md) | Ready current quote; stop for private human-only checkout. |
-| Verify payment and read order | [Orders](orders.md) | Actual paid association; never infer payment from redirects. |
-| Diagnose failures and response loss | [Troubleshooting](troubleshooting.md) | Preserve private evidence; no blind write retries. |
+| Set up access or get a key | [Authentication](authentication.md) | Configured endpoint; new keys need activation. |
+| Choose material and profile | [Catalogs](catalogs.md) | Request and preferences; use suitable catalog defaults. |
+| Upload a model | [Uploads](uploads.md) | Supported local file; poll the asset until ready. |
+| Create an RFQ | [RFQs](rfqs.md) | Ready asset, selections, quantity and destination. |
+| Get a quote | [Quotes](quotes.md) | Actionable RFQ; poll the returned quote ID. |
+| Send the offer and checkout link | [Checkout](checkout.md) | Ready current quote; buyer opens the link and pays. |
+| Track an order | [Orders](orders.md) | API-confirmed payment and associated order ID. |
+| Recover from errors | [Troubleshooting](troubleshooting.md) | Saved resource IDs and API responses. |
 
-Signed upload targets and checkout links are private capabilities, separate from
-API authentication. Never use the bearer config on either. No fixed price,
-production availability, enabled tax handling, delivery date or live-payment
-approval is implied by these examples.
+Upload requests use the returned signed target rather than API authentication.
+Checkout links are for the buyer's browser. Prices, availability and order updates
+come from API responses.

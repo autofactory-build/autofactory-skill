@@ -1,12 +1,10 @@
-# Verify confirmed payment, then read the associated order
+# Track an order
 
-Optional Bash/curl/jq examples; no scripts or SDK are installed. Load [authentication](authentication.md) first if its private directory, approved origin and bearer config are not already prepared. Requires an actual human [checkout](checkout.md) attempt, not authorization to pay.
+Use the [API access setup](authentication.md) and the quote/RFQ IDs from the
+[checkout offer](checkout.md).
 
-Set `AF_QUOTE_ID` and `AF_RFQ_ID` to the exact quote and RFQ reviewed by the
-human. Do not guess IDs or create replacement resources in this task.
-
-Only after the human's checkout attempt, re-read the same quote and RFQ. Do not
-infer payment from a browser redirect or an `accepted` state.
+Set `AF_QUOTE_ID` and `AF_RFQ_ID` to the saved IDs. Read the quote and RFQ to check
+payment; a redirect or an `accepted` quote alone does not confirm it.
 
 ```bash
 AF_STATUS=$(curl --disable --config "$AF_PRIVATE_DIR/api.curl" \
@@ -35,7 +33,6 @@ AF_STATUS=$(curl --disable --config "$AF_PRIVATE_DIR/api.curl" \
 test "$AF_STATUS" = 200 || exit 1
 ```
 
-Verify the RFQ's ordered state and the same paid quote/order association before
-claiming an order. Keep order/contact/shipping JSON private. Report only fields
-actually returned; no tracking or delivery guarantees are implied. The skill
-neither pays nor contacts a printer or the payment provider directly.
+Check that the RFQ is ordered and refers to the same paid quote and order.
+Use the returned order state and any tracking details for updates. If tracking or
+a delivery estimate is absent, say so.

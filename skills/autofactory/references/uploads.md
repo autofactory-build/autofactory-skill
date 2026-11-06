@@ -1,11 +1,14 @@
-# Reserve, PUT raw bytes, then await inspection
+# Upload a model
 
-Optional Bash/curl/jq examples; no scripts or SDK are installed. Load [authentication](authentication.md) first if its private directory, approved origin and bearer config are not already prepared. Load [catalogs](catalogs.md) if supported input limits/formats are not known.
+Use the [API access setup](authentication.md). Check [catalogs](catalogs.md) for
+supported file formats and limits.
 
-Use the customer-authorized local STL path in `AF_FILE`, already checked in
-authentication setup. Reservation is bodyless and sends no Content-Type.
+Set `AF_FILE` to the local STL path and check that it exists. Reservation takes no
+body or Content-Type.
 
 ```bash
+: "${AF_FILE:?local STL file required}"
+test -f "$AF_FILE"
 AF_STATUS=$(curl --disable --config "$AF_PRIVATE_DIR/api.curl" \
   --silent --show-error --fail-with-body --proto '=https' \
   --request POST "$AF_ORIGIN/v1/assets" \
@@ -43,12 +46,10 @@ jq '{id,state,rejection,byte_size,file_format,dimensions_mm}' \
   "$AF_PRIVATE_DIR/asset.json"
 ```
 
-The filename above is an optional generic display label, not a format assertion.
-Validate the returned target as HTTPS, use its expiry and required headers exactly,
-and never attach general API credentials. Current required headers include
-`If-None-Match: *`; do not overwrite an existing object. A successful PUT is not
-asset readiness. There is **no separate complete-upload endpoint**: scheduled
-inspection finds the uploaded object.
+The optional filename is a display label. Use the returned upload URL before it
+expires, with its required headers and without the API bearer token.
+`If-None-Match: *` makes the upload create-only. After PUT, inspection runs
+automatically; there is no upload-completion endpoint.
 
 Repeat only the asset GET with bounded backoff until `state == "ready"`; stop on
 `rejected` and inspect `rejection`. Honor Retry-After if present. On a lost PUT

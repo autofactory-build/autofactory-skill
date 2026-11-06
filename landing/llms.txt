@@ -1,20 +1,18 @@
 # AutoFactory
 
-> AutoFactory turns customer-supplied manufacturing designs into quoted, paid,
-> manufactured physical goods. The initial workflow is FDM 3D printing.
+> Get 3D models manufactured through an agent-friendly API. Upload a model,
+> choose a material, get a quote, and send the buyer a checkout link.
 
-New API keys require operator activation. Quotes are not orders; confirmed
-payment creates an order. A human must approve the exact purchase and complete
-hosted checkout. Agents do not control printers or retrieve production artifacts.
-Use the operator-confirmed API origin and capabilities; do not assume production
-availability, supported destinations, materials, pricing, or turnaround.
+Agents handle quoting and order updates. The buyer completes hosted checkout.
+New API keys need activation. The API reports current materials, limits, prices
+and order state.
 
 ## Agent instructions
 
-- [AutoFactory skill](https://autofactory.build/skill.md): Customer workflow, approval boundaries, and verification.
-- [HTTP workflow](https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/references/api-workflow.md): HTTP request examples and durable-resource readbacks.
-- [Troubleshooting](https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/references/troubleshooting.md): Activation, rate limits, uncertain requests, and quote conflicts.
+- [AutoFactory skill](https://autofactory.build/skill.md): Start here for quoting and order tracking.
+- [API workflow](https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/references/api-workflow.md): Task references and HTTP examples.
+- [Troubleshooting](https://raw.githubusercontent.com/autofactory-build/autofactory-skill/main/skills/autofactory/references/troubleshooting.md): Activation, rate limits and request recovery.
 
 ## Optional
 
-- [Skill repository](https://github.com/autofactory-build/autofactory-skill): Source, review history, and installation instructions.
+- [Skill repository](https://github.com/autofactory-build/autofactory-skill): Source and installation instructions.

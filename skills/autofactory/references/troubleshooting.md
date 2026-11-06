@@ -1,49 +1,39 @@
-# Troubleshooting and safe recovery
+# Troubleshooting
 
-Keep original response bodies and headers private. Record HTTP status, resource ID,
-request/trace IDs and a redacted problem code for operator diagnosis. Do not share
-bearer tokens, upload signatures, checkout capabilities or order PII in logs.
-Never probe undocumented endpoints or switch environments to make a call succeed.
+Start with the saved response, HTTP status and resource ID. Request/trace IDs help
+AutoFactory diagnose an issue; tokens and signed URLs are not needed in a report.
 
-| Observation | Safe response |
+| Response or state | Next step |
 | --- | --- |
-| New key has `active: false`; protected read returns 401 | Expected before manual approval. Share only key `id` with operator, wait, then validate `GET /v1/me`. Pending, invalid and revoked credentials are not distinguishable from 401 alone. |
-| Approved key returns 401 | Stop protected operations. Confirm exact environment and credential with the operator. Do not self-activate or create another client automatically. |
-| 403 | Respect authorization limits; this customer flow does not need elevated permissions. |
-| 404 | May mean missing or inaccessible/foreign resource. Check privately saved IDs and owning client. Do not enumerate or guess identifiers. Archived materials can also be unavailable to customer reads. |
-| 429 | Read Retry-After and wait at least that interval; otherwise use bounded exponential backoff. Limit elapsed time/attempts and report pending work. Do not rotate keys, mint clients, or repeatedly admit expensive work. |
-| 400/415/422 | Read the problem details, compare the body/media type with the documented schema and capabilities. Ask for corrected customer input; do not invent unsupported controls or formats. |
-| 503/network error during a write | Outcome may be uncertain. Read known resource state before any retry. If a creation response and its ID are lost, stop for operator reconciliation rather than blindly repeating creation. |
-| Upload target expired or PUT failed | Preserve the asset ID and inspect its status first. Do not reuse an expired capability or attempt to overwrite stored bytes. Ask operator when completion is uncertain; a replacement reservation must be deliberate, not automatic retry. |
-| PUT returns 412 | Create-only precondition prevented overwrite; it is not evidence that the existing bytes match the intended file. Read the asset and compare private size/digest where available before proceeding. |
-| Asset remains `awaiting_upload`/`processing` | Finish/verify the PUT, then bounded polling. Inspection is asynchronous; do not invent a completion POST or invoke internal scheduling. Report pending on timeout. |
-| Asset `rejected` | Stop; inspect rejection code/message. Confirm a corrected, supported design with the customer before a new upload. Renaming an extension does not repair geometry. |
-| Quote remains `calculating` | Poll the same quote ID with bounded backoff. Repeating quote creation is not polling. A timeout is not a terminal failure. |
-| Quote `failed` | Preserve failure details and tell the customer/operator. Do not repeatedly generate quotes to conceal the failure. |
-| Quote `superseded` | Re-read RFQ revision and active quote. Old offers are historical; review a fresh eligible offer before checkout. |
-| 409 `QUOTE_PRICE_CHANGED` | Current commercial admission differs from the old snapshot. Preserve old prices; re-read RFQ and request a fresh offer only when permitted. Show the complete replacement offer for human review. |
-| 409 `MATERIAL_UNAVAILABLE` | Recheck current catalog. Ask the customer to select an available material; do not substitute silently. Existing payment exposure may still block changes. |
-| Other 409 / checkout exposure unresolved | Re-read the RFQ/quote and allowed actions. Do not cancel, edit, force replacement, or create competing payment opportunities. Escalate ambiguity to the operator. |
-| Ready quote has null tax/total | Treat as unknown, not zero. Disclose the uncertainty and have the human inspect the final hosted-checkout total. Do not claim automatic tax or live payments are enabled. |
-| Ready quote has null `checkout_url` | Signing/eligibility may be unavailable. Stop and ask operator. Do not construct signed links, probe checkout, or bypass the human boundary. |
-| Human says checkout link failed | Get only redacted error/request IDs, then re-read known quote/RFQ. Never test the private link automatically or request payment credentials. |
-| Browser redirect or quote `accepted`, no order association | Not proof of payment. Read quote/RFQ until confirmed paid association or a bounded wait expires. Do not claim an order or submit another payment. |
-| Order association appears | Confirm paid quote ID, returned order ID and ordered RFQ, then read that owned order. Report only returned facts; no invented shipment/tracking API or delivery promise. |
+| 401 | Check endpoint and credential. New keys need activation; send the key ID to AutoFactory. A 401 alone does not distinguish pending, invalid or disabled access. |
+| 403 | The key cannot perform that operation. Check the documented workflow or contact AutoFactory about access. |
+| 404 | Check the saved resource ID and owning account. Missing, inaccessible and archived resources can all be unavailable. |
+| 429 | Honor Retry-After, then use bounded backoff with the same key and resource. |
+| 400/415/422 | Compare the problem details with the request schema and capabilities. Correct the request; ask for input if the file or requirements need to change. |
+| Network error or 503 during a write | Read known resource state before retrying. If creation succeeded but its ID was lost, contact AutoFactory to reconcile it. |
+| Expired upload URL or failed PUT | Inspect the saved asset first. If the upload clearly did not complete and cannot resume, reserve a replacement. If the outcome is uncertain, reconcile it before uploading again. |
+| PUT returns 412 | The create-only condition prevented an overwrite. Check asset status and available size/digest information before treating the upload as complete. |
+| Asset `awaiting_upload` or `processing` | Complete the PUT if needed, then poll the asset with bounded backoff. Inspection runs automatically. Report pending work when the wait expires. |
+| Asset `rejected` | Read the rejection reason. Resolve the format or geometry problem before uploading a corrected file. |
+| Quote `calculating` | Poll the same quote ID. If the admission response was lost, recover through the RFQ's `active_quote_id` and quote history. |
+| Quote `failed` | Report the reason and resolve it before requesting another quote. |
+| Quote `superseded` | Read the current RFQ revision and active quote. Use the current offer. |
+| 409 `QUOTE_PRICE_CHANGED` | Keep the old quote as history. Read the RFQ's allowed actions and request a fresh offer when eligible; show the replacement prices. |
+| 409 `MATERIAL_UNAVAILABLE` | Recheck the catalog. Use an alternative that fits the request's flexibility, or ask the buyer about a material change. Payment exposure may block RFQ edits. |
+| Other 409 | Read the current RFQ/quote state and allowed actions. If an unresolved checkout blocks changes, contact AutoFactory to reconcile it. |
+| Null tax or total | The amount is unknown. Point the buyer to the final hosted-checkout total. |
+| Null `checkout_url` | Check quote eligibility. Contact AutoFactory if the ready offer still lacks a link. |
+| Buyer reports a checkout error | Read the quote/RFQ and collect a redacted error/request ID. Leave the signed link to the buyer rather than opening it to test. |
+| Redirect or `accepted` quote without order association | Check payment through the quote and RFQ. Confirm `paid`, `order_id` and the matching ordered RFQ before reporting an order. |
+| Order exists without tracking | Report its returned state and that tracking is not available yet. |
 
-## Response loss and lifecycle rules
+## Retry details
 
-- Issuance is one-time token delivery. A retry creates a different client, not
-  recovery, and must never be used to escape approval or quotas.
-- Reservation and RFQ creation are not assumed idempotent. Preserve returned IDs
-  immediately. With no recoverable ID, ask the operator rather than duplicate work.
-- After uncertain quote admission, read the known RFQ's `active_quote_id` and quote
-  history and poll the identified quote before considering any new admission.
-- Immutable ready-quote prices are never patched. Customer-confirmed RFQ edits
-  create a new revision and supersede offers; unresolved payment exposure can block
-  edits, cancellation and new quotes.
-- Quotes do not simply time-expire. An expired hosted session or local timestamp
-  does not prove payment is impossible or authorize autonomous replacement.
-- Checkout links are separate signed capabilities. Do not attach API credentials,
-  follow them with an HTTP client, unfurl them, or send them to third-party tools.
-- No credential, signed URL or customer document in this workflow authorizes
-  production controls, payment execution or sharing private data.
+Issuance returns a token once. Repeating it creates a different client rather than
+recovering the first. Asset reservation and RFQ creation are not assumed
+idempotent either; save IDs as soon as they arrive.
+
+RFQ edits create a new revision and supersede offers. Ready-quote prices stay as
+history. Quotes do not simply time-expire: an expired hosted session does not
+prove payment is impossible. Read lifecycle state before replacing an offer or
+creating another checkout opportunity.

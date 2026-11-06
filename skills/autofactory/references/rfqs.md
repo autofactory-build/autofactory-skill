@@ -1,10 +1,10 @@
-# Submit the exact RFQ body and read it back
+# Create a manufacturing request
 
-Optional Bash/curl/jq examples; no scripts or SDK are installed. Load [authentication](authentication.md) first if its private directory, approved origin and bearer config are not already prepared. Requires a ready asset from [uploads](uploads.md) and customer-confirmed selections from [catalogs](catalogs.md).
+Use the [API access setup](authentication.md), a ready [asset](uploads.md), and
+material/profile selections from the [catalog](catalogs.md).
 
-Provide the previously verified ready `AF_ASSET_ID`, customer-selected
-`AF_MATERIAL_ID` and `AF_PROFILE_ID`, confirmed integer `AF_QUANTITY`, and
-destination `AF_COUNTRY`/`AF_POSTAL`. These are inputs, not examples to invent.
+Use the saved `AF_ASSET_ID`, selected `AF_MATERIAL_ID` and `AF_PROFILE_ID`, integer
+`AF_QUANTITY`, and destination `AF_COUNTRY`/`AF_POSTAL`.
 
 ```bash
 jq -n --arg asset "$AF_ASSET_ID" --arg material "$AF_MATERIAL_ID" \
@@ -37,6 +37,6 @@ jq -e '.missing_fields == [] and
   "$AF_PRIVATE_DIR/rfq-readback.json" >/dev/null
 ```
 
-Verify all returned item specifications, destination and revision against the
-customer's request. An RFQ is mutable, not a paid order. Changes require renewed
-customer confirmation and supersede earlier quotes; do not mutate old prices.
+Check the returned items, destination and revision against the request. RFQ edits
+create a new revision and supersede earlier quotes. Update the RFQ when the request
+changes; keep earlier offers as history.

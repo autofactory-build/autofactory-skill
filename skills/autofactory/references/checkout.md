@@ -1,9 +1,9 @@
-# Human review and checkout boundary
+# Send the quote to the buyer
 
-Optional Bash/curl/jq examples; no scripts or SDK are installed. Load [authentication](authentication.md) first if its private directory, approved origin and bearer config are not already prepared. Requires a ready [quote](quotes.md) for the intended RFQ revision.
+Use a ready [quote](quotes.md) for the current RFQ revision. The buyer completes
+checkout; the agent prepares the offer and sends the link.
 
-Use the saved ready `quote.json` and its known `AF_RFQ_ID`. This task only
-reviews the offer and hands checkout to the human; it never executes payment.
+Read the saved `quote.json` and compare its revision with the current RFQ.
 
 ```bash
 jq -e '.state == "ready"' "$AF_PRIVATE_DIR/quote.json" >/dev/null
@@ -12,17 +12,14 @@ jq '{id,rfq_id,rfq_revision,state,destination,items,line_items,
      subtotal,shipping,tax,total}' "$AF_PRIVATE_DIR/quote.json"
 ```
 
-Check this quote's RFQ ID and revision against a fresh RFQ read. Show quantity,
-material/profile/configuration, every item cost and line item, separate shipping,
-tax, total and currency. Item `cost` is for its full quantity; slicer estimates are
-single-unit. Money uses `amount_cents` and `currency`. Never hardcode a minimum,
-shipping rate or tax value. A null total/tax is unknown, not free: disclose it and
-require the human to inspect the final hosted total before paying. Test pricing
-is not approval for real payments or evidence of enabled production tax handling.
+Show quantities, material/profile choices, item costs, quote-level line items,
+shipping, tax, total and currency. Item `cost` covers the full quantity; material
+and manufacturing-time estimates are per unit. Money uses `amount_cents` and
+`currency`. Use returned prices. A null tax or total is unknown; point the buyer
+to the final hosted-checkout amount.
 
-Read `checkout_url` from the private quote JSON using the agent's private state
-access, without printing it into shared tool output. After human review, deliver
-it only through an approved private channel. If no such channel exists, stop.
-Do not curl, prefetch, preview, auto-open or test the link. It can create a payment
-session when opened. The human opens it and completes any payment themselves.
-A null link means stop and ask the operator, not invent another checkout route.
+Send `checkout_url` directly to the buyer with the offer. It is a signed link that
+can create a payment session when opened, so exclude it from automated previews,
+link checks and HTTP requests. The buyer opens it and pays; hosted checkout
+collects their full shipping address. If the link is null, check quote eligibility
+and contact AutoFactory if needed.
