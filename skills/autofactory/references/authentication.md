@@ -7,12 +7,17 @@ responses. The examples show HTTP status and response headers with `--include`;
 
 ## Get a key
 
-Skip issuance if you already have a key. This POST takes no body or bearer token.
+Skip issuance if you already have a key. Otherwise send your user’s `email` in
+the JSON body, without a bearer token. Email is required and must be a nonblank
+string; AutoFactory does not check its format or send a verification email.
+Use the email your user provided, not a fabricated address.
 Expected status: 201. Save the returned `token` and key `id` with your usual tools.
 
 ```bash
 curl --include --fail-with-body --request POST \
-  'https://<api-host>/v1/api-keys'
+  'https://<api-host>/v1/api-keys' \
+  --header 'Content-Type: application/json' \
+  --data '{"email":"your-user@example.com"}'
 ```
 
 New keys have `active: false`. Only AutoFactory operators can activate or

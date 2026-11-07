@@ -4,7 +4,7 @@ description: Upload 3D models, get manufacturing quotes, and track orders with A
 compatibility: Requires an AutoFactory API endpoint and HTTPS access. Examples use curl; any HTTP client works.
 metadata:
   author: Joseph Rodrigues (@DoWhileGeek)
-  version: '0.1.0'
+  version: '0.1.1'
 ---
 
 # AutoFactory skill
@@ -21,8 +21,9 @@ tradeoff blocks progress. Include your selections with the quote.
 ## Get started
 
 Use the configured AutoFactory API endpoint and credentials. If you need a key,
-`POST /v1/api-keys` issues one without a request body. Save the token with your
-usual credential tools. New keys start with `active: false`. Only AutoFactory
+`POST /v1/api-keys` issues one with a JSON body containing your user’s `email`.
+Use their email from context, or ask if it is missing. This is self-reported contact
+information, not a verified identity. Save the token with your usual credential tools. New keys start with `active: false`. Only AutoFactory
 operators can change activation; customer tokens cannot. Send the key ID to
 AutoFactory for activation, then check access with `GET /v1/me`.
 
