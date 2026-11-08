@@ -5,7 +5,7 @@ quote (200):
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/quotes/<quote-id>' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/quotes/<quote-id>' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
@@ -13,7 +13,7 @@ When it is `paid` with an `order_id`, confirm the RFQ association (200):
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/rfqs/<rfq-id>' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/rfqs/<rfq-id>' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
@@ -22,7 +22,7 @@ Then read the returned order ID (200):
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/orders/<order-id>' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/orders/<order-id>' \
   --header 'Authorization: Bearer <api-key>'
 ```
 

@@ -1,10 +1,10 @@
 ---
 name: autofactory
 description: Upload 3D models, get manufacturing quotes, and track orders with AutoFactory.
-compatibility: Requires an AutoFactory API endpoint and HTTPS access. Examples use curl; any HTTP client works.
+compatibility: Requires HTTPS access to the included AutoFactory staging API. Examples use curl; any HTTP client works.
 metadata:
   author: Joseph Rodrigues (@DoWhileGeek)
-  version: '0.1.0'
+  version: '0.1.2'
 ---
 
 # AutoFactory skill
@@ -20,14 +20,19 @@ tradeoff blocks progress. Include your selections with the quote.
 
 ## Get started
 
-Use the configured AutoFactory API endpoint and credentials. If you need a key,
-`POST /v1/api-keys` issues one without a request body. Save the token with your
+API base URL: `https://autofactory-api-staging.dowhilegeek.workers.dev` (staging).
+Use this URL directly; no separate API-host configuration is needed.
+
+If you need a key, send `POST /v1/api-keys` with a JSON body containing your user’s
+`email`. Use their email from context, or ask if it is missing. This is self-reported
+contact information, not a verified identity. Save the returned token with your
 usual credential tools. New keys start with `active: false`. Only AutoFactory
 operators can change activation; customer tokens cannot. Send the key ID to
 AutoFactory for activation, then check access with `GET /v1/me`.
 
-The curl examples use placeholders for the API host, token and resource IDs. See
-[authentication](references/authentication.md) for issuance and access checks.
+The curl examples include the API URL. Replace only token and resource-ID
+placeholders. See [authentication](references/authentication.md) for signup and
+access checks.
 
 ## Get a quote
 

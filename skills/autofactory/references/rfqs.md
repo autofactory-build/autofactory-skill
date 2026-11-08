@@ -12,7 +12,7 @@ Expected status: 201.
 
 ```bash
 curl --include --fail-with-body --request POST \
-  'https://<api-host>/v1/rfqs' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/rfqs' \
   --header 'Authorization: Bearer <api-key>' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -40,7 +40,7 @@ Read the returned RFQ `id` (200):
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/rfqs/<rfq-id>' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/rfqs/<rfq-id>' \
   --header 'Authorization: Bearer <api-key>'
 ```
 

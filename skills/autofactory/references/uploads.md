@@ -10,7 +10,7 @@ This POST has no body or Content-Type. Expected status: 201.
 
 ```bash
 curl --include --fail-with-body --request POST \
-  'https://<api-host>/v1/assets' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/assets' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
@@ -38,7 +38,7 @@ Read the asset (200):
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/assets/<asset-id>' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/assets/<asset-id>' \
   --header 'Authorization: Bearer <api-key>'
 ```
 

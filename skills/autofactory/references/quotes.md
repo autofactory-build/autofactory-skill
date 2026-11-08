@@ -5,7 +5,7 @@ This POST takes no body or Content-Type. Expected status: 202.
 
 ```bash
 curl --include --fail-with-body --request POST \
-  'https://<api-host>/v1/rfqs/<rfq-id>/quote' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/rfqs/<rfq-id>/quote' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
@@ -13,7 +13,7 @@ Save the quote `id`, then read it (200):
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/quotes/<quote-id>' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/quotes/<quote-id>' \
   --header 'Authorization: Bearer <api-key>'
 ```
 

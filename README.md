@@ -12,29 +12,26 @@ for each task, so agents can load what they need as they go.
 npx skills add autofactory-build/autofactory-skill --skill autofactory
 ```
 
-This is a private draft on a review branch. The command above is for the reviewed
-release; it does not install this draft from `main`. Private access requires Git
-credentials with repository access.
+The public skill includes the current staging API URL:
+`https://autofactory-api-staging.dowhilegeek.workers.dev`.
+No separate API-host setup is needed. New API keys require an email and operator
+activation.
 
 ## What's included
 
 - [`skills/autofactory/`](skills/autofactory/SKILL.md): the skill and task references.
 - [Workflow map](skills/autofactory/references/api-workflow.md): an index of API tasks.
-- [Distribution notes](docs/distribution.md): release checklist and proposed landing integration.
-- [`landing/llms.txt`](landing/llms.txt): a draft discovery index, not yet deployed.
+- [Distribution notes](docs/distribution.md): distribution and landing integration.
+- [`landing/llms.txt`](landing/llms.txt): the discovery index served by the landing page.
 
 The skill is Markdown-only and uses the [Agent Skills format](https://agentskills.io/specification).
 The examples are standalone curl commands with placeholders; any HTTP client works.
 
-## Review status
+## Availability
 
-API examples follow the AutoFactory OpenAPI contract and handlers. Offline checks
-cover frontmatter, local links and shell syntax; they do not establish live API
-or payment availability. The launch API endpoint still needs to be selected.
-
-Content approval, a license choice and publication approval are pending. The PR
-remains private and unmerged; registry submission and landing changes are separate
-release steps. See the [release checklist](docs/distribution.md#release-checklist).
+The skill targets the staging API for early testing. Its examples use the included
+API URL; tokens and resource IDs remain placeholders. Your user completes hosted
+checkout. Update an already-installed copy to receive these instructions.
 
 ## Author
 

@@ -1,18 +1,24 @@
 # API access
 
-Replace `<api-host>` with your AutoFactory API host and `<api-key>` with your token.
+Use `https://autofactory-api-staging.dowhilegeek.workers.dev` as the API base URL.
+Replace `<api-key>` with your token; the API host is already included below.
 Other angle-bracket placeholders stand for values from your request or API
 responses. The examples show HTTP status and response headers with `--include`;
 `--fail-with-body` reports HTTP errors. Any HTTP client works.
 
 ## Get a key
 
-Skip issuance if you already have a key. This POST takes no body or bearer token.
+Skip issuance if you already have a key. Otherwise send your user’s `email` in
+the JSON body, without a bearer token. Email must be nonblank text; AutoFactory
+does not check its format or send a verification email. Use the address your
+user provided, not a fabricated address.
 Expected status: 201. Save the returned `token` and key `id` with your usual tools.
 
 ```bash
 curl --include --fail-with-body --request POST \
-  'https://<api-host>/v1/api-keys'
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/api-keys' \
+  --header 'Content-Type: application/json' \
+  --data '{"email":"your-user@example.com"}'
 ```
 
 New keys have `active: false`. Only AutoFactory operators can activate or
@@ -25,7 +31,7 @@ After operator activation, this returns 200 with your key ID, client ID and rank
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/me' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/me' \
   --header 'Authorization: Bearer <api-key>'
 ```
 

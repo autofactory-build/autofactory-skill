@@ -7,19 +7,19 @@ These reads return 200:
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/capabilities' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/capabilities' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/materials?manufacturing_method=fdm_3d_printing&in_stock=true&page_number=1&page_size=100' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/materials?manufacturing_method=fdm_3d_printing&in_stock=true&page_number=1&page_size=100' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/profiles?manufacturing_method=fdm_3d_printing&status=active&page_number=1&page_size=100' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/profiles?manufacturing_method=fdm_3d_printing&status=active&page_number=1&page_size=100' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
@@ -31,13 +31,13 @@ Read the selected material and profile details (200):
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/materials/<material-id>' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/materials/<material-id>' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
 ```bash
 curl --include --fail-with-body \
-  'https://<api-host>/v1/profiles/<profile-id>' \
+  'https://autofactory-api-staging.dowhilegeek.workers.dev/v1/profiles/<profile-id>' \
   --header 'Authorization: Bearer <api-key>'
 ```
 
